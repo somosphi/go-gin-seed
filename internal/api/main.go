@@ -13,6 +13,12 @@ func StartServer() (err error) {
 		return
 	}
 
+	err = s.ConnectToDabase()
+	if err != nil {
+		log.Error("failed to create to the database", err)
+		return
+	}
+
 	err = s.Setup().Start()
 	if err != nil {
 		log.Error("failed to serve the api", err)

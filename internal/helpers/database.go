@@ -44,6 +44,7 @@ func GetDatabase(cfg *DbConfig) (*gorm.DB, error) {
 
 	once.Do(func() {
 		database, err = gorm.Open("mysql", _mountConnectionString(cfg))
+		err = database.DB().Ping()
 	})
 
 	return database, err

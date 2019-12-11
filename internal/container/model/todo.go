@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"github.com/google/uuid"
@@ -9,7 +9,7 @@ type (
 	Todo struct {
 		gorm.Model
 		Title     string `gorm:"default:'Empty Title'"`
-		Completed int    `gorm:"type:tiny int(1);default:0"`
+		Completed int    `gorm:"type:tinyint(1);default:0"`
 	}
 
 	todoMysql struct {
@@ -23,6 +23,7 @@ type (
 )
 
 func NewTodoMysql(db *gorm.DB) (tm TodoModel) {
+	db.AutoMigrate(&Todo{})
 	return &todoMysql{db}
 }
 

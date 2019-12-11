@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"github.com/google/uuid"
@@ -23,6 +23,7 @@ type (
 )
 
 func NewPostModel(db *gorm.DB) PostModel {
+	db.AutoMigrate(&Post{})
 	return &postMysql{db}
 }
 

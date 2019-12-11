@@ -15,6 +15,7 @@ type Server struct {
 	Config    *Config
 	Container *container.Container
 	engine    *gin.Engine
+	db        *gorm.DB
 }
 
 func createDatabase() (db *gorm.DB, err error) {
@@ -32,14 +33,18 @@ func New() (s *Server, err error) {
 	return
 }
 
-func (s *Server) Setup() *Server {
+func (s *Server) ConnectToDabase() error {
 	db, err := createDatabase()
 	if err != nil {
-		return nil
+		return err
 	}
+	s.db = db
+	return nil
+}
 
+func (s *Server) Setup() *Server {
 	s.Container = container.NewContainer(
-		container.NewContainerConfig(db),
+		container.NewContainerConfig(s.db),
 	)
 
 	s.engine = gin.Default()
