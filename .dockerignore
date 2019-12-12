@@ -1,0 +1,7 @@
+docs
+scripts
+src
+Dockerfile
+package.json
+README.md
+node_modules
