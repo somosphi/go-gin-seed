@@ -18,6 +18,7 @@ func StartServer() (err error) {
 		log.Error("failed to create to the database", err)
 		return
 	}
+	defer s.CloseDB()
 
 	err = s.Setup().Start()
 	if err != nil {

@@ -31,16 +31,15 @@ func NewTodoController(c *container.Container) controllers.Controller {
 func (tdc *todoController) Register(gr *gin.RouterGroup) {
 	todoGroup := gr.Group("/v1/todos")
 
-	todoGroup.POST("", tdc.createTodo)
+	todoGroup.POST(
+		"",
+		tdc.createTodo,
+	)
 	todoGroup.GET("", tdc.getAllTodos)
 	todoGroup.GET("/:todo_id", tdc.getTodo)
 	todoGroup.PATCH("/:todo_id", tdc.updateTodo)
 	todoGroup.DELETE("/:todo_id", tdc.deleteTodo)
 }
-
-func (todoController) getTodo(ctx *gin.Context) {}
-
-func (todoController) getAllTodos(ctx *gin.Context) {}
 
 func (todoController) createTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{
@@ -48,6 +47,10 @@ func (todoController) createTodo(ctx *gin.Context) {
 		"todo": "created",
 	})
 }
+
+func (todoController) getTodo(ctx *gin.Context) {}
+
+func (todoController) getAllTodos(ctx *gin.Context) {}
 
 func (todoController) updateTodo(ctx *gin.Context) {}
 
