@@ -5,11 +5,10 @@ import (
 	"golang-seed/internal/container"
 	"golang-seed/internal/helpers"
 	"golang-seed/internal/http"
-	logger "golang-seed/internal/http/middlewares/log"
+	log "golang-seed/internal/http/middlewares/log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	log "github.com/sirupsen/logrus"
 )
 
 type Server struct {
@@ -48,15 +47,17 @@ func (s *Server) Setup() *Server {
 		container.NewContainerConfig(s.db),
 	)
 
-	s.engine = gin.Default()
-	logger.AttachReqResLogger(s.engine, nil)
+	s.engine = gin.New()
+
+	log.AttachReqResLogger(s.engine, log.New())
+	s.engine.Use(gin.Recovery())
 
 	http.SetupRoutes(s.engine, s.Container)
 	return s
 }
 
 func (s *Server) Start() error {
-	log.Infof("server listening on localhost:%d\n", s.Config.Port)
+	log.Logger.Infof("server listening on localhost:%d\n", s.Config.Port)
 	return s.engine.Run(
 		fmt.Sprintf(":%d", s.Config.Port),
 	)

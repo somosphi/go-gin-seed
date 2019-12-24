@@ -1,6 +1,7 @@
 port: 3000
 
 api:
+  logLevel: DEBUG # DEBUG INFO FATAL
   bodyLimit: 500kb
 
 database:

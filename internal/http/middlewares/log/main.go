@@ -1,38 +1,41 @@
 package logger
 
 import (
+	"os"
 	"sync"
-	"time"
 
-	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	ginlogrus "github.com/toorop/gin-logrus"
 )
 
-var logger *zap.Logger
+var Logger *logrus.Logger
 var once sync.Once
 
-// GetLogger returns the singleton instance of the logger
-func GetLogger() (*zap.Logger, error) {
-	var err error
-	once.Do(func() {
-		logger, err = zap.NewProduction()
-	})
-	return logger, err
+func getLogLevel() logrus.Level {
+	switch viper.GetString("api.logLevel") {
+	case "INFO":
+		return logrus.InfoLevel
+	case "FATAL":
+		return logrus.FatalLevel
+	}
+	// default return is DEBUG level
+	return logrus.DebugLevel
 }
 
-func AttachReqResLogger(e *gin.Engine, log *zap.Logger) {
-	if log == nil {
-		log, _ = GetLogger()
-	}
+func New() *logrus.Logger {
+	once.Do(func() {
+		Logger = logrus.New()
 
-	// Add a ginzap middleware, which:
-	//   - Logs all requests, like a combined access and error log.
-	//   - Logs to stdout.
-	//   - RFC3339 with UTC time format.
-	e.Use(ginzap.Ginzap(log, time.RFC3339, true))
+		Logger.SetFormatter(&logrus.JSONFormatter{})
+		Logger.SetOutput(os.Stdout)
+		Logger.SetLevel(getLogLevel())
+	})
 
-	// Logs all panic to error log
-	//   - stack means whether output the stack info.
-	e.Use(ginzap.RecoveryWithZap(log, true))
+	return Logger
+}
+
+func AttachReqResLogger(e *gin.Engine, l *logrus.Logger) {
+	e.Use(ginlogrus.Logger(l))
 }
