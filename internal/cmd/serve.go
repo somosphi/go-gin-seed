@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"golang-seed/internal/api"
+	log "golang-seed/internal/http/middlewares/log"
+	"golang-seed/internal/server"
 
 	"github.com/spf13/cobra"
 )
@@ -16,8 +17,26 @@ var (
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
+	log.New()
 }
 
-func run(cmd *cobra.Command, args []string) error {
-	return api.StartServer()
+func run(cmd *cobra.Command, args []string) (err error) {
+	s, err := server.New()
+	if err != nil {
+		log.Logger.Error("failed to create a server", err)
+		return
+	}
+
+	err = s.ConnectToDabase()
+	if err != nil {
+		log.Logger.Error("failed to create to the database", err)
+		return
+	}
+	defer s.CloseDB()
+
+	err = s.Setup().Start()
+	if err != nil {
+		log.Logger.Error("failed to serve the api", err)
+	}
+	return
 }

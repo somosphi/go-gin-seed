@@ -11,7 +11,7 @@ import (
 func _loadControllers(c *container.Container) []controllers.Controller {
 	return []controllers.Controller{
 		v1.NewTodoController(c),
-		// v1.NewPostController(c),
+		v1.NewPostController(c),
 	}
 }
 

@@ -1,6 +1,8 @@
-port: 3000
+apm:
+  name: golang-seed-api
 
 api:
+  port: 3000
   logLevel: DEBUG # DEBUG INFO FATAL
   bodyLimit: 500kb
 
