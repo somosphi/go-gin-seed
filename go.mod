@@ -3,6 +3,7 @@ module golang-seed
 go 1.13
 
 require (
+	emperror.dev/emperror v0.21.3 // indirect
 	github.com/gin-contrib/zap v0.0.0-20191128031730-d12829f8f61b
 	github.com/gin-gonic/gin v1.5.0
 	github.com/google/uuid v1.1.1

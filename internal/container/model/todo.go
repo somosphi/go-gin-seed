@@ -1,15 +1,17 @@
 package model
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 )
 
 type (
 	Todo struct {
-		gorm.Model
-		Title     string `gorm:"default:'Empty Title'" json:"title"`
-		Completed int    `gorm:"type:tinyint(1);default:0" json:"completed"`
+		ID        uuid.UUID `gorm:"primary_key;type:varchar(64);" json:"id"`
+		Title     string    `gorm:"default:'Empty Title'" json:"title"`
+		Completed int       `gorm:"type:tinyint(1);default:0" json:"completed"`
 	}
 
 	todoMysql struct {
@@ -28,9 +30,25 @@ func NewTodoMysql(db *gorm.DB) (tm TodoModel) {
 	return &todoMysql{db}
 }
 
+func (t *Todo) String() string {
+	return fmt.Sprintf("Title: %s\nCompleted: %b", t.Title, t.Completed)
+}
+
+func (t *Todo) ToJsonMap() map[string]interface{} {
+	return map[string]interface{}{
+		"id":        t.ID,
+		"title":     t.Title,
+		"completed": t.Completed,
+	}
+}
+
 // BeforeCreate add uuid as Todo.ID
-func (*Todo) BeforeCreate(scope *gorm.Scope) error {
-	err := scope.SetColumn("ID", uuid.New())
+func (t *Todo) BeforeCreate(scope *gorm.Scope) error {
+	id := uuid.New()
+	err := scope.SetColumn("ID", id)
+	if err == nil {
+		t.ID = id
+	}
 	return err
 }
 

@@ -1,12 +1,13 @@
 package v1
 
 import (
+	"encoding/json"
 	"golang-seed/internal/container"
+	"golang-seed/internal/container/model"
 	"golang-seed/internal/http/controllers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type (
@@ -31,21 +32,45 @@ func NewTodoController(c *container.Container) controllers.Controller {
 func (tdc *todoController) Register(gr *gin.RouterGroup) {
 	todoGroup := gr.Group("/v1/todos")
 
-	todoGroup.POST(
-		"",
-		tdc.createTodo,
-	)
+	todoGroup.POST("", tdc.createTodo)
 	todoGroup.GET("", tdc.getAllTodos)
 	todoGroup.GET("/:todo_id", tdc.getTodo)
 	todoGroup.PATCH("/:todo_id", tdc.updateTodo)
 	todoGroup.DELETE("/:todo_id", tdc.deleteTodo)
 }
 
-func (todoController) createTodo(ctx *gin.Context) {
-	ctx.JSON(http.StatusCreated, gin.H{
-		"id":   uuid.New(),
-		"todo": "created",
-	})
+func (tc *todoController) createTodo(ctx *gin.Context) {
+	var body *model.Todo
+	rawData, err := ctx.GetRawData()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to parse data",
+			"err":     err,
+		})
+		return
+	}
+
+	_ = json.Unmarshal(rawData, &body)
+	if body == nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to parse data",
+			"err":     "invlid request body",
+		})
+		return
+	}
+
+	err = tc.c.TodoService.CreateTodo(body)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to create todo",
+			"err":     err,
+		})
+		return
+	}
+
+	resJson := body.ToJsonMap()
+
+	ctx.JSON(http.StatusCreated, resJson)
 }
 
 func (todoController) getTodo(ctx *gin.Context) {}
