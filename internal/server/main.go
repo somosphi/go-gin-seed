@@ -20,7 +20,7 @@ type Server struct {
 
 func createDatabase() (db *gorm.DB, err error) {
 	dbConfig, err := helpers.NewDbConfig()
-	if err == nil {
+	if err == nil && dbConfig != nil {
 		db, err = helpers.GetDatabase(dbConfig)
 	}
 
@@ -58,9 +58,7 @@ func (s *Server) Setup() *Server {
 
 func (s *Server) Start() error {
 	log.Logger.Infof("server listening on localhost:%d\n", s.Config.Port)
-	return s.engine.Run(
-		fmt.Sprintf(":%d", s.Config.Port),
-	)
+	return s.engine.Run(fmt.Sprintf(":%d", s.Config.Port))
 }
 
 func (s *Server) CloseDB() {
